@@ -1,28 +1,55 @@
 const express = require("express");
+const Categories = require("../Models/Categories");
 const route = express.Router();
 const Product = require("../Models/Product");
 
 route.get("/product", async (req, res) => {
   try {
-     const allProduct = await Product.find()
-     if(!allProduct){
-         res.status(401).json({msg:'no product'})
-     }
-     res.status(200).json(allProduct)
+    const allProduct = await Product.find();
+    if (!allProduct) {
+      res.status(401).json({ msg: "no product" });
+    }
+    res.status(200).json(allProduct);
   } catch (error) {
-      res.status(500).json({msg:error.message})
+    res.status(500).json({ msg: error.message });
   }
 });
 
 route.post("/addproduct", async (req, res) => {
+  const {
+    name,
+    description,
+    richdescrption,
+    image,
+    images,
+    brand,
+    price,
+    category,
+    countinstocke,
+    rating,
+    isFeatured,
+    numReviews,
+    dateCreated,
+  } = req.body;
   try {
-    const { name, image, CountInStock } = req.body;
     const product = new Product({
       name,
+      description,
+      richdescrption,
       image,
-      CountInStock,
+      images,
+      brand,
+      price,
+      category,
+      countinstocke,
+      rating,
+      isFeatured,
+      numReviews,
+      dateCreated,
     });
     await product.save();
+    let categorieinproduct = await Categories.findById(product.category);
+    console.log(categorieinproduct);
     res.status(201).json(product);
   } catch (error) {
     res.status(500).json({ msg: error.message });
