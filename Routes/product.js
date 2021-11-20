@@ -5,11 +5,26 @@ const Product = require("../Models/Product");
 
 route.get("/product", async (req, res) => {
   try {
-    const allProduct = await Product.find();
+    const allProduct = await Product.find().select(
+      "name image images"
+    ).populate("category");
     if (!allProduct) {
       res.status(401).json({ msg: "no product" });
     }
     res.status(200).json(allProduct);
+  } catch (error) {
+    res.status(500).json({ msg: error.message });
+  }
+});
+
+route.get("/product/:id", async (req, res) => {
+  const idProd = req.params.id;
+  try {
+    const product = await Product.findById(idProd).populate("category");
+    if (!product) {
+      res.status(401).json({ msg: "no product" });
+    }
+    res.status(200).json(product);
   } catch (error) {
     res.status(500).json({ msg: error.message });
   }
