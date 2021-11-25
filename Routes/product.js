@@ -1,14 +1,16 @@
 const express = require("express");
 const { set } = require("mongoose");
 const Categories = require("../Models/Categories");
+const mongoose = require("mongoose");
 
 const route = express.Router();
 const Product = require("../Models/Product");
 
+//get all prod
 route.get("/product", async (req, res) => {
   try {
     const allProduct = await Product.find()
-      .select("name image images")
+      .select("name image images isFeatured")
       .populate("category");
     if (!allProduct) {
       res.status(401).json({ msg: "no product" });
@@ -19,6 +21,7 @@ route.get("/product", async (req, res) => {
   }
 });
 
+//get prod by id
 route.get("/product/:id", async (req, res) => {
   const idProd = req.params.id;
   try {
@@ -32,6 +35,7 @@ route.get("/product/:id", async (req, res) => {
   }
 });
 
+//add prod
 route.post("/addproduct", async (req, res) => {
   const {
     name,
@@ -73,7 +77,11 @@ route.post("/addproduct", async (req, res) => {
   }
 });
 
+//update prod
 route.put("/updateproduct/:id", async (req, res) => {
+  if (mongoose.isValidObjectId(req.params.id)) {
+    return res.status(500).json({ msg: "id is not the same" });
+  }
   // check for the right categorie
   const {
     name,
@@ -125,4 +133,67 @@ route.put("/updateproduct/:id", async (req, res) => {
   }
 });
 
+//delelet prod
+route.delete("/deleteprod/:id", async (req, res) => {
+  // if (mongoose.isValidObjectId(req.params.id)) {
+  //   return res.status(500).json({ msg: "id is not the same" });
+  // }
+  try {
+    const product = await Product.findByIdAndRemove(req.params.id);
+    console.log(product);
+    res.status(200).json({
+      msg: "success",
+      product,
+    });
+  } catch (error) {
+    return res.status(500).json({ msg: error.message });
+  }
+});
+
+//get count of all prod
+route.get("/get/count", async (req, res) => {
+  try {
+    const countProd = await Product.countDocuments();
+    if (countProd) {
+      return res.status(200).json(countProd);
+    }
+  } catch (error) {
+    console.error(error.message);
+    res.status(500).json({ msg: error.message });
+  }
+});
+
+//get the all feather product
+route.get("/get/feathured/:count", async (req, res) => {
+  const count = req.params.count ? req.params.count : 0;
+  try {
+    const isFeaturedProd = await Product.find({ isFeatured: true }).limit(
+      +count
+    );
+    if (isFeaturedProd) {
+      res.status(200).json({ isFeaturedProd });
+    }
+  } catch (error) {
+    console.error(error.message);
+    res.status(500).json({ msg: error.message });
+  }
+});
+
+//feltring and get prods with categories
+// localhost://3000/prodbycategory?categories=id1 ,id2
+route.get("/prodbycategory", async (req, res) => {
+  let filtred = {};
+  if (req.query.categories) {
+    filtred = { category: req.query.categories.split(",") };
+  }
+  console.log(filtred);
+  try {
+    const product = await Product.find(filtred).populate("category");
+    if (product) {
+      res.status(200).json({ product });
+    }
+  } catch (error) {
+    res.status(500).json({ msg: error.message });
+  }
+});
 module.exports = route;
