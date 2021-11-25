@@ -1,3 +1,4 @@
 {
-    "mongoUri":"mongodb+srv://safwen:safwen123@cluster0-eyyjv.mongodb.net/Eshop?retryWrites=true&w=majority"
+  "mongoUri": "mongodb+srv://safwen:safwen123@cluster0-eyyjv.mongodb.net/Eshop?retryWrites=true&w=majority",
+  "secret": "safwen"
 }
