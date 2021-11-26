@@ -78,6 +78,7 @@ route.post("/login", async (req, res) => {
         {
           userId: user._id,
           userEmail: user.email,
+          isAdmin: user.isAdmin,
         },
         secret,
         { expiresIn: "1h" }
