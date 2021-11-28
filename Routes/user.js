@@ -6,6 +6,7 @@ const salt = bcrypt.genSaltSync(10);
 const config = require("config");
 const secret = config.get("secret");
 const jwt = require("jsonwebtoken");
+const { Router } = require("express");
 //get all user without passward
 route.get("/", async (req, res) => {
   try {
@@ -87,6 +88,32 @@ route.post("/login", async (req, res) => {
         user,
         token,
       });
+    }
+  } catch (error) {
+    res.status(500).json({ msg: error.message });
+  }
+});
+
+//get count of users
+route.get("/get/count", async (req, res) => {
+  try {
+    const countProd = await Users.countDocuments();
+    if (countProd) {
+      return res.status(200).json(countProd);
+    }
+  } catch (error) {
+    console.error(error.message);
+    res.status(500).json({ msg: error.message });
+  }
+});
+//delete user
+route.delete("/:id", async (req, res) => {
+  const idUser = req.params.id;
+  try {
+    const delUser = await Users.findByIdAndRemove(idUser);
+    console.log(delUser);
+    if (delUser) {
+      return res.status(201).json({ msg: "deleted with success", delUser });
     }
   } catch (error) {
     res.status(500).json({ msg: error.message });

@@ -4,9 +4,9 @@ const mongoose = require("mongoose");
 
 const route = express.Router();
 const Product = require("../Models/Product");
-const authmidddel = require('../Midellwares/authmidddel')
+const authmidddel = require("../Midellwares/authmidddel");
 //get all prod
-route.get("/product",authmidddel, async (req, res) => {
+route.get("/product", authmidddel, async (req, res) => {
   try {
     const allProduct = await Product.find()
       .select("name image images isFeatured")
@@ -35,7 +35,7 @@ route.get("/product/:id", async (req, res) => {
 });
 
 //add prod
-route.post("/addproduct",authmidddel, async (req, res) => {
+route.post("/addproduct", authmidddel, async (req, res) => {
   const {
     name,
     description,
