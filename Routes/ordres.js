@@ -101,6 +101,11 @@ route.delete("/:id", async (req, res) => {
   try {
     const order = await Order.findByIdAndRemove(idOrder);
     if (order) {
+      const orderitems = order.orderitems.map(async (orderitem) => {
+        const deleteOrderitem = await OrderItem.findByIdAndRemove(orderitem);
+        console.log(deleteOrderitem);
+      });
+
       return res.status(200).json({ msg: "this user is deleted", order });
     }
   } catch (error) {
