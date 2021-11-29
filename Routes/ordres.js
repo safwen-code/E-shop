@@ -1,4 +1,5 @@
 const express = require("express");
+const { now } = require("mongoose");
 const Order = require("../Models/Order");
 const OrderItem = require("../Models/OrderItem");
 const route = express.Router();
@@ -150,6 +151,28 @@ route.get("/get/count", async (req, res) => {
     if (countOrder) {
       res.status(200).json(countOrder);
     }
+  } catch (error) {
+    res.status(500).json({ msg: error.message });
+  }
+});
+
+//get order by user id
+route.get("/orderuser/:userid", async (req, res) => {
+  const userid = req.params.userid;
+  try {
+    const orderuser = await Order.find({ user: userid })
+      .populate({
+        path: "orderitems",
+        populate: {
+          path: "product",
+          populate: "category",
+        },
+      })
+      .sort({ dateOrdred: -1 });
+    if (orderuser) {
+      return res.status(200).json({ orderuser });
+    }
+    console.log(orderuser);
   } catch (error) {
     res.status(500).json({ msg: error.message });
   }
