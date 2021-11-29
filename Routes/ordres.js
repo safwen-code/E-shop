@@ -40,6 +40,7 @@ route.get("/:id", async (req, res) => {
 });
 
 //post order
+//calcule the all price order
 route.post("/", async (req, res) => {
   const orderitemsId = Promise.all(
     req.body.orderitems.map(async (valueItem) => {
@@ -52,6 +53,20 @@ route.post("/", async (req, res) => {
     })
   );
   const orderItemresolved = await orderitemsId;
+
+  const totalPrices = await Promise.all(
+    orderItemresolved.map(async (orderitem) => {
+      const orderValues = await OrderItem.findById(orderitem).populate(
+        "product",
+        "price"
+      );
+      const totalPrice = orderValues.product.price * orderValues.quantity;
+      return totalPrice;
+    })
+  );
+
+  const totalPrice = totalPrices.reduce((a, b) => a + b, 0);
+
   try {
     const newOrder = new Order({
       orderitems: orderItemresolved,
@@ -62,7 +77,7 @@ route.post("/", async (req, res) => {
       country: req.body.country,
       phone: req.body.phone,
       status: req.body.status,
-      totalPrice: req.body.totalPrice,
+      totalPrice: totalPrice,
       user: req.body.user,
     });
 
