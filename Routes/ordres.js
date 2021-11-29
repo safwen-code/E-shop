@@ -127,4 +127,31 @@ route.delete("/:id", async (req, res) => {
     res.status(500).json({ msg: error.message });
   }
 });
+
+//get all orderSales
+//problem limit inaggregate function in cluster
+route.get("/get/allsales", async (req, res) => {
+  try {
+    const allSalels = await Order.aggregate([
+      {
+        $groupe: { _id: null, totalsalles: { $sum: "$totalPrice" } },
+      },
+    ]);
+  } catch (error) {
+    res.status(500).json({ msg: error.message });
+  }
+});
+
+//get count of order
+route.get("/get/count", async (req, res) => {
+  try {
+    const countOrder = await Order.countDocuments();
+    console.log(countOrder);
+    if (countOrder) {
+      res.status(200).json(countOrder);
+    }
+  } catch (error) {
+    res.status(500).json({ msg: error.message });
+  }
+});
 module.exports = route;
