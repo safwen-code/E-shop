@@ -5,7 +5,33 @@ const route = express.Router();
 
 route.get("/", async (req, res) => {
   try {
-    res.status(200).json({ msg: "hi from orders" });
+    const orders = await Order.find()
+      .populate("user", "name")
+      .sort({ dateOrdred: -1 });
+    console.log(orders);
+    if (orders) {
+      return res.status(200).json({ orders });
+    }
+  } catch (error) {
+    res.status(500).json({ msg: error.message });
+  }
+});
+
+route.get("/:id", async (req, res) => {
+  const orderid = req.params.id;
+  try {
+    const order = await Order.findById(orderid)
+      .populate("user", "name")
+      .populate({
+        path: "orderitems",
+        populate: {
+          path: "product",
+          populate: "category",
+        },
+      });
+    if (order) {
+      return res.status(200).json(order);
+    }
   } catch (error) {
     res.status(500).json({ msg: error.message });
   }
