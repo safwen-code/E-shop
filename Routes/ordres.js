@@ -3,6 +3,7 @@ const Order = require("../Models/Order");
 const OrderItem = require("../Models/OrderItem");
 const route = express.Router();
 
+//get all order
 route.get("/", async (req, res) => {
   try {
     const orders = await Order.find()
@@ -17,6 +18,7 @@ route.get("/", async (req, res) => {
   }
 });
 
+//get order by id
 route.get("/:id", async (req, res) => {
   const orderid = req.params.id;
   try {
@@ -37,6 +39,7 @@ route.get("/:id", async (req, res) => {
   }
 });
 
+//post order
 route.post("/", async (req, res) => {
   const orderitemsId = Promise.all(
     req.body.orderitems.map(async (valueItem) => {
@@ -66,6 +69,40 @@ route.post("/", async (req, res) => {
     await newOrder.save();
 
     res.status(200).json({ newOrder });
+  } catch (error) {
+    res.status(500).json({ msg: error.message });
+  }
+});
+
+//update order
+route.put("/:id", async (req, res) => {
+  const orderid = req.params.id;
+  try {
+    const updateUser = await Order.findByIdAndUpdate(
+      orderid,
+      {
+        $set: {
+          status: req.body.status,
+        },
+      },
+      { new: true }
+    );
+    if (updateUser) {
+      return res.status(201).json(updateUser);
+    }
+  } catch (error) {
+    res.status(500).json({ msg: error.message });
+  }
+});
+
+//delete order
+route.delete("/:id", async (req, res) => {
+  const idOrder = req.params.id;
+  try {
+    const order = await Order.findByIdAndRemove(idOrder);
+    if (order) {
+      return res.status(200).json({ msg: "this user is deleted", order });
+    }
   } catch (error) {
     res.status(500).json({ msg: error.message });
   }
