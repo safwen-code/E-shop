@@ -3,8 +3,8 @@ const bodyParser = require("body-parser");
 const morgan = require("morgan");
 const connnectDB = require("./config/connectDB");
 const cors = require("cors");
-const Auth = require("./Midellwares/Auth");
-
+const authmidddel = require("./Midellwares/authmidddel");
+const path = require("path");
 //get routes
 const product = require("./Routes/product");
 const categories = require("./Routes/Categories");
@@ -25,8 +25,7 @@ connnectDB();
 //bodyparser middelware
 app.use(express.json({ extended: false }));
 app.use(morgan("tiny"));
-// app.use(Auth);
-
+app.use("/images", express.static(path.join(__dirname, "images")));
 //use routes
 app.use("/", product);
 app.use("/categories", categories);
