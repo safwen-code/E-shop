@@ -5,6 +5,8 @@ const mongoose = require("mongoose");
 const route = express.Router();
 const Product = require("../Models/Product");
 const authmidddel = require("../Midellwares/authmidddel");
+const multer = require("../Midellwares/Multer-config");
+
 //get all prod
 route.get("/product", authmidddel, async (req, res) => {
   try {
@@ -35,7 +37,7 @@ route.get("/product/:id", async (req, res) => {
 });
 
 //add prod
-route.post("/addproduct", authmidddel, async (req, res) => {
+route.post("/addproduct", multer, async (req, res) => {
   const {
     name,
     description,
@@ -56,7 +58,9 @@ route.post("/addproduct", authmidddel, async (req, res) => {
       name,
       description,
       richdescrption,
-      image,
+      image:`${req.protocol}://${req.get("host")}/images/${
+        req.file.filename
+      }`,
       images,
       brand,
       price,
